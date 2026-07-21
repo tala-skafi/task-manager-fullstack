@@ -1,0 +1,55 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 page-title mb-0">{{ isEdit ? 'Edit Task' : 'New Task' }}</h1>
+  <a routerLink="/tasks" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    @if (errorMessage()) {
+      <div class="alert alert-danger py-2">{{ errorMessage() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input type="text" class="form-control" formControlName="title"
+               [class.is-invalid]="form.controls.title.touched && form.controls.title.invalid">
+        <div class="invalid-feedback">Title is required.</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" rows="4" formControlName="description"></textarea>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" formControlName="status">
+            @for (status of statuses; track status) {
+              <option [ngValue]="status">{{ statusLabels[status] }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Due Date</label>
+          <input type="date" class="form-control" formControlName="dueDate">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Assigned User</label>
+          <select class="form-select" formControlName="assignedUserId">
+            <option [ngValue]="null">Unassigned</option>
+            @for (user of users(); track user.id) {
+              <option [ngValue]="user.id">{{ user.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+        {{ isEdit ? 'Save Changes' : 'Create Task' }}
+      </button>
+    </form>
+  </div>
+</div>

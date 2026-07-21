@@ -1,0 +1,64 @@
+<h1 class="h3 page-title mb-4">My Profile</h1>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Personal Information</div>
+      <div class="card-body">
+        @if (profileSaved()) {
+          <div class="alert alert-success py-2">Profile updated successfully.</div>
+        }
+        @if (profileError()) {
+          <div class="alert alert-danger py-2">{{ profileError() }}</div>
+        }
+
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" formControlName="name"
+                   [class.is-invalid]="profileForm.controls.name.touched && profileForm.controls.name.invalid">
+            <div class="invalid-feedback">Name is required.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" formControlName="email"
+                   [class.is-invalid]="profileForm.controls.email.touched && profileForm.controls.email.invalid">
+            <div class="invalid-feedback">A valid email is required.</div>
+          </div>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Change Password</div>
+      <div class="card-body">
+        @if (passwordSaved()) {
+          <div class="alert alert-success py-2">Password changed successfully.</div>
+        }
+        @if (passwordError()) {
+          <div class="alert alert-danger py-2">{{ passwordError() }}</div>
+        }
+
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <div class="mb-3">
+            <label class="form-label">Current Password</label>
+            <input type="password" class="form-control" formControlName="currentPassword"
+                   [class.is-invalid]="passwordForm.controls.currentPassword.touched && passwordForm.controls.currentPassword.invalid">
+            <div class="invalid-feedback">Current password is required.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">New Password</label>
+            <input type="password" class="form-control" formControlName="newPassword"
+                   [class.is-invalid]="passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.invalid">
+            <div class="invalid-feedback">{{ passwordHint }}</div>
+            <div class="form-text">{{ passwordHint }}</div>
+          </div>
+          <button type="submit" class="btn btn-primary">Change Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

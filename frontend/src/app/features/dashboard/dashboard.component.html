@@ -1,0 +1,68 @@
+<h1 class="h3 page-title mb-4">Dashboard</h1>
+
+@if (loading()) {
+  <div class="text-center text-muted py-5">
+    <span class="spinner-border"></span>
+  </div>
+} @else if (stats()) {
+  @if (stats()!; as s) {
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small">Total Users</div>
+          <div class="h2 mb-0">{{ s.totalUsers }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small">Total Tasks</div>
+          <div class="h2 mb-0">{{ s.totalTasks }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small">Completed</div>
+          <div class="h2 mb-0 text-success">{{ s.completedTasks }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small">Pending</div>
+          <div class="h2 mb-0 text-warning">{{ s.pendingTasks }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <span class="badge bg-secondary">In Progress: {{ s.inProgressTasks }}</span>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <a routerLink="/users" class="btn btn-outline-primary w-100 py-3">
+        <i class="bi bi-people me-1"></i>Manage Users
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a routerLink="/tasks" class="btn btn-outline-primary w-100 py-3">
+        <i class="bi bi-list-task me-1"></i>Manage Tasks
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a routerLink="/activity" class="btn btn-outline-primary w-100 py-3">
+        <i class="bi bi-clock-history me-1"></i>Activity Log
+      </a>
+    </div>
+  </div>
+  }
+} @else {
+  <div class="alert alert-danger">Could not load statistics.</div>
+}
