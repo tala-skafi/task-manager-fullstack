@@ -5,6 +5,8 @@ import com.example.taskmanager.activity.ActivityService;
 import com.example.taskmanager.common.Role;
 import com.example.taskmanager.common.TaskStatus;
 import com.example.taskmanager.common.exception.ResourceNotFoundException;
+import com.example.taskmanager.notification.NotificationService;
+import com.example.taskmanager.notification.NotificationTypes;
 import com.example.taskmanager.task.dto.CreateTaskRequest;
 import com.example.taskmanager.task.dto.TaskResponse;
 import com.example.taskmanager.task.dto.UpdateTaskRequest;
@@ -22,13 +24,16 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
     private final ActivityService activityService;
+    private final NotificationService notificationService;
 
     public TaskService(TaskRepository taskRepository,
                        UserService userService,
-                       ActivityService activityService) {
+                       ActivityService activityService,
+                       NotificationService notificationService) {
         this.taskRepository = taskRepository;
         this.userService = userService;
         this.activityService = activityService;
+        this.notificationService = notificationService;
     }
 
     /** Admins see every task; regular users see only the tasks assigned to them. */
@@ -55,6 +60,10 @@ public class TaskService {
         task.setAssignedUser(resolveAssignee(request.assignedUserId()));
         Task saved = taskRepository.save(task);
         activityService.record(ActivityActions.TASK_CREATED, "Created task '" + saved.getTitle() + "'");
+        if (saved.getAssignedUser() != null) {
+            notificationService.notifyTask(saved, NotificationTypes.TASK_ASSIGNED,
+                    "Task '" + saved.getTitle() + "' was assigned to " + saved.getAssignedUser().getName());
+        }
         return TaskResponse.from(saved);
     }
 
@@ -77,6 +86,8 @@ public class TaskService {
         task.setStatus(status);
         Task saved = taskRepository.save(task);
         activityService.record(ActivityActions.TASK_STATUS_UPDATED,
+                "Task '" + saved.getTitle() + "' status changed to " + status);
+        notificationService.notifyTask(saved, NotificationTypes.TASK_STATUS,
                 "Task '" + saved.getTitle() + "' status changed to " + status);
         return TaskResponse.from(saved);
     }

@@ -1,6 +1,8 @@
 package com.example.taskmanager.comment;
 
 import com.example.taskmanager.comment.dto.CommentResponse;
+import com.example.taskmanager.notification.NotificationService;
+import com.example.taskmanager.notification.NotificationTypes;
 import com.example.taskmanager.task.Task;
 import com.example.taskmanager.task.TaskService;
 import com.example.taskmanager.user.User;
@@ -16,13 +18,16 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final TaskService taskService;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     public CommentService(CommentRepository commentRepository,
                           TaskService taskService,
-                          UserService userService) {
+                          UserService userService,
+                          NotificationService notificationService) {
         this.commentRepository = commentRepository;
         this.taskService = taskService;
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -43,6 +48,9 @@ public class CommentService {
         comment.setUser(author);
         comment.setContent(content);
 
-        return CommentResponse.from(commentRepository.save(comment));
+        Comment saved = commentRepository.save(comment);
+        notificationService.notifyTask(task, NotificationTypes.COMMENT,
+                author.getName() + " commented on task '" + task.getTitle() + "'");
+        return CommentResponse.from(saved);
     }
 }

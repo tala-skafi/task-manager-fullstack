@@ -6,6 +6,8 @@ import com.example.taskmanager.common.Role;
 import com.example.taskmanager.common.UserStatus;
 import com.example.taskmanager.common.exception.BadRequestException;
 import com.example.taskmanager.common.exception.ResourceNotFoundException;
+import com.example.taskmanager.notification.NotificationService;
+import com.example.taskmanager.notification.NotificationTypes;
 import com.example.taskmanager.user.dto.CreateUserRequest;
 import com.example.taskmanager.user.dto.UpdateUserRequest;
 import com.example.taskmanager.user.dto.UserResponse;
@@ -22,13 +24,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ActivityService activityService;
+    private final NotificationService notificationService;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       ActivityService activityService) {
+                       ActivityService activityService,
+                       NotificationService notificationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.activityService = activityService;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -62,6 +67,7 @@ public class UserService {
 
         User saved = userRepository.save(user);
         activityService.record(ActivityActions.USER_CREATED, "Created user " + saved.getUsername());
+        notificationService.notifyUser(NotificationTypes.USER, "User " + saved.getUsername() + " was created");
         return UserResponse.from(saved);
     }
 
@@ -84,6 +90,7 @@ public class UserService {
 
         User saved = userRepository.save(user);
         activityService.record(ActivityActions.USER_UPDATED, "Updated user " + saved.getUsername());
+        notificationService.notifyUser(NotificationTypes.USER, "User " + saved.getUsername() + " was updated");
         return UserResponse.from(saved);
     }
 
@@ -96,6 +103,7 @@ public class UserService {
         // Foreign-key rules unassign the user's tasks and remove their comments.
         userRepository.delete(user);
         activityService.record(ActivityActions.USER_DELETED, "Deleted user " + user.getUsername());
+        notificationService.notifyUser(NotificationTypes.USER, "User " + user.getUsername() + " was deleted");
     }
 
     /** Shared lookup used by other services. */
